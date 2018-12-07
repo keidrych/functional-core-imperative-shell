@@ -11,8 +11,7 @@ module.exports = async (fastify, options) => {
 			schema: schema.get['/'],
 			method: 'GET',
 			handler: async request => {
-				return 'world'
-				//return getHello({request})
+				return getHello({request})
 			}
 		})
 }
