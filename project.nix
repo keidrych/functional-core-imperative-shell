@@ -47,13 +47,17 @@ buildNodePackage {
       eslint-plugin-node_8-0-0
       namespaces.commitlint.prompt-cli_7-2-1
       eslint_5-10-0
+      babel-runtime_6-26-0
       eslint-plugin-prettier_3-0-0
       nock_10-0-4
       eslint-config-prettier_3-3-0
+      rxjs-compat_6-3-3
       testdouble_3-9-1
       pino-pretty_2-5-0
       local-repl_4-0-0
+      rxjs_6-3-3
       tap-mocha-reporter_3-0-7
+      run-node_1-0-0
       eslint-config-xo_0-25-1
       namespaces.commitlint.cli_7-2-1
       npm-pin-dependencies_1-0-1

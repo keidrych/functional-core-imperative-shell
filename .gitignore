@@ -10,6 +10,7 @@ coverage.lcov
 Thumbs.db
 coverage.lcov
 node_modules/
+node_modules
 python_modules/
 config/development.js
 config/production.js
