@@ -14,3 +14,4 @@ python_modules/
 config/development.js
 config/production.js
 scratchpad*
+package-lock.json
