@@ -69,7 +69,8 @@ in
 			transient-layers = pkgs.unstable.dockerTools.buildLayeredImage {
 				name = ("transient-layers-" + buildInfo.name + "-dev");
 				tag = buildInfo.tag;
-				contents = imagePackages ++ imagePackagesDev ++ buildInfo.packages ++ [(import ./default.nix ({ inherit (pkgs); inherit (nodejs); })).env];
+				# Development container image is broken, 'env' is chaining up into nodeModules causing nodeModules to run after and erase the 'env' setting.
+				contents = imagePackages ++ imagePackagesDev ++ buildInfo.packages ++ [ nodeModules.env ];
 			};
 			in
 				pkgs.unstable.dockerTools.buildImage {
