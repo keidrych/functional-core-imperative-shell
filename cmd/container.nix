@@ -12,6 +12,7 @@ buildInfo = {
   # Ensure that any pkgs called / referenced in 'config' are specifically declared in the packages for layered-image to keep last layer minimal
   config = {
 		Env = [ "NODE_PATH=/lib/${nodeModules.modulePath}/${nodeModules.basicName}/node_modules"
+						"NODE_ENV=production"
 					];
     # Cmd must be specified as Nix strips any prior definition out to ensure clean execution
 		Cmd = [
@@ -45,7 +46,7 @@ pkgs = import <nixpkgs> {
   ) ];
 };
 
-nodeModules = (import ./default.nix ({ inherit (pkgs); inherit (nodejs); }));
+nodeModules = (import ../default.nix ({ inherit (pkgs); inherit (nodejs); }));
 in
 	rec {
 		prod = let
@@ -71,7 +72,7 @@ in
 					} // buildInfo.config // { Env = buildInfo.config.Env ++ [ pathProd ]; });
 				};
 		# Note: '.env' is chaining up into nodeModules causing nodeModules to run after and erase the 'env' setting. At this time its not possible to place a node application with all 'Development' dependencies into a container.
-		dev = let
+		debug = let
 			transient-layers = pkgs.unstable.dockerTools.buildLayeredImage {
 				name = ("transient-layers-" + buildInfo.name + "-debug");
 				tag = buildInfo.tag;

@@ -13,7 +13,7 @@ buildNodePackage {
       upath_1-1-0
       rambdax_1-3-0
       debug_4-1-0
-      fastify-sensible_0-2-0
+      fastify-sensible_0-3-0
       xxhashjs_0-2-2
       rfdc_1-1-2
       ajv_6-6-2
@@ -36,7 +36,7 @@ buildNodePackage {
       password-magic_1-0-0
     ];
     devDependencies = with nodePackages; [
-      husky_1-2-1
+      husky_1-3-0
       nyc_13-1-0
       updated_1-3-0
       eslint-plugin-ava_5-1-1
