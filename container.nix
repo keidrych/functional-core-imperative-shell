@@ -11,11 +11,12 @@ buildInfo = {
   ];
   # Ensure that any pkgs called / referenced in 'config' are specifically declared in the packages for layered-image to keep last layer minimal
   config = {
-		Env = [ "PATH=${pkgs.coreutils}/bin/:${nodejs}/bin/:${pkgs.bash}/bin/"
-						"NODE_PATH=/lib/${nodeModules.modulePath}/${nodeModules.basicName}" ];
+		Env = [ "NODE_PATH=/lib/${nodeModules.modulePath}/${nodeModules.basicName}/node_modules"
+					];
     # Cmd must be specified as Nix strips any prior definition out to ensure clean execution
 		Cmd = [
-			"npm start"
+			"${nodejs}/bin/npm"
+			"start"
 		];
 		WorkingDir = "/lib/${nodeModules.modulePath}/${nodeModules.basicName}";
   };
@@ -23,8 +24,12 @@ buildInfo = {
   tag = "latest";
 };
 
-imagePackages			= [ pkgs.coreutils pkgs.tini pkgs.bash ];
-imagePackagesDev	= [];
+# Production should contain only the essentials to run the application in a container.
+imagePackages				= [ pkgs.coreutils pkgs.tini ];
+pathProd						= "PATH=${pkgs.coreutils}/bin/:${nodejs}/bin/";
+# Debug should contain the additional tooling for interactivity and debugging, doesn't necessarily pull in the applications 'Development' mode and libraries
+imagePackagesDebug  = [ pkgs.bash ];
+pathDebug						= "${pathProd}:${pkgs.bash}/bin/";
 
 #######################
 # Build Image Code    #
@@ -50,41 +55,35 @@ in
 				contents = imagePackages ++ buildInfo.packages ++ [ nodeModules ];
 			};
 			in
+				# https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/docker/default.nix contains all available attributes.
 				pkgs.unstable.dockerTools.buildImage {
 					name = buildInfo.name;
 					tag = buildInfo.tag;
 					fromImage = transient-layers;
 					# Nix is building the container in a workspace, links should always be ./ which will result in / in the final container
 					extraCommands = ''
-						#readlink ./lib/node_modules/cloud-native-internal/node_modules
 						# Examples
 						# mkdir -p ./var/lib/mysql
 						# ln -s "${pkgs.bash}/bin/bash"  ./bash
 					'';
 					config = ({
 						Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
-					} // buildInfo.config );
+					} // buildInfo.config // { Env = buildInfo.config.Env ++ [ pathProd ]; });
 				};
+		# Note: '.env' is chaining up into nodeModules causing nodeModules to run after and erase the 'env' setting. At this time its not possible to place a node application with all 'Development' dependencies into a container.
 		dev = let
 			transient-layers = pkgs.unstable.dockerTools.buildLayeredImage {
-				name = ("transient-layers-" + buildInfo.name + "-dev");
+				name = ("transient-layers-" + buildInfo.name + "-debug");
 				tag = buildInfo.tag;
-				# Development container image is broken, 'env' is chaining up into nodeModules causing nodeModules to run after and erase the 'env' setting.
-				contents = imagePackages ++ imagePackagesDev ++ buildInfo.packages ++ [ nodeModules.env ];
+				contents = imagePackages ++ imagePackagesDebug ++ buildInfo.packages ++ [ nodeModules ];
 			};
 			in
 				pkgs.unstable.dockerTools.buildImage {
-					name = buildInfo.name + "-dev";
+					name = buildInfo.name + "-debug";
 					tag = buildInfo.tag;
 					fromImage = transient-layers;
-					# Nix is building the container in a workspace, links should always be ./ which will result in / in the final container
-					extraCommands = ''
-						# Examples
-						# mkdir -p ./var/lib/mysql
-						# ln -s "${pkgs.bash}/bin/bash"  ./bash
-					'';
 					config = ({
 						Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
-					} // buildInfo.config );
+					} // buildInfo.config // { Env = buildInfo.config.Env ++ [ pathDebug ]; });
 				};
 }
