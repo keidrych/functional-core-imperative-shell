@@ -5,6 +5,7 @@ let
 #######################
 
 nodejs = pkgs.nodejs-8_x;
+s6Version = "1.21.7.0";
 
 buildInfo = {
 	packages = [
@@ -25,8 +26,8 @@ buildInfo = {
 };
 
 # Production should contain only the essentials to run the application in a container.
-imagePackages				= [ pkgs.coreutils pkgs.tini ];
-pathProd						= "PATH=${pkgs.coreutils}/bin/:${nodejs}/bin/";
+imagePackages				= [ pkgs.coreutils pkgs.tini "${s6}" ];
+pathProd						= "PATH=${pkgs.coreutils}/bin/:${s6}/bin:${nodejs}/bin/";
 # Debug should contain the additional tooling for interactivity and debugging, doesn't necessarily pull in the applications 'Development' mode and libraries
 imagePackagesDebug  = [ pkgs.bash ];
 pathDebug						= "${pathProd}:${pkgs.bash}/bin/";
@@ -44,6 +45,8 @@ pkgs = import <nixpkgs> {
     }
   ) ];
 };
+
+s6 = fetchTarball "https://github.com/just-containers/s6-overlay/releases/download/v${s6Version}/s6-overlay-amd64.tar.gz";
 
 nodeModules = (import ./default.nix ({ inherit (pkgs); inherit (nodejs); }));
 in
@@ -71,7 +74,7 @@ in
 					} // buildInfo.config // { Env = buildInfo.config.Env ++ [ pathProd ]; });
 				};
 		# Note: '.env' is chaining up into nodeModules causing nodeModules to run after and erase the 'env' setting. At this time its not possible to place a node application with all 'Development' dependencies into a container.
-		dev = let
+		debug = let
 			transient-layers = pkgs.unstable.dockerTools.buildLayeredImage {
 				name = ("transient-layers-" + buildInfo.name + "-debug");
 				tag = buildInfo.tag;
@@ -83,7 +86,8 @@ in
 					tag = buildInfo.tag;
 					fromImage = transient-layers;
 					config = ({
-						Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
+						#Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
+						Entrypoint = [ "/init" ];
 					} // buildInfo.config // { Env = buildInfo.config.Env ++ [ pathDebug ]; });
 				};
 }
