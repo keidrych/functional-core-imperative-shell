@@ -17,3 +17,5 @@ config/production.js
 scratchpad*
 package-lock.json
 result*
+default.nix
+container/
