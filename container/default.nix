@@ -3,4 +3,4 @@ let
     lib = import ../nix-node-packages {
       inherit pkgs nodejs;
     };
-    in lib.callPackage ./project.nix {}
+    in lib.callPackage ../project.nix {}

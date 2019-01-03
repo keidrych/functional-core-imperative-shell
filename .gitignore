@@ -19,3 +19,4 @@ package-lock.json
 result*
 default.nix
 container/
+*.swp
