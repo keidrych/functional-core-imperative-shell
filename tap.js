@@ -1,6 +1,6 @@
 'use strict'
 
-require('resquire')
+require('tap-spec-integrated')
 require('make-promises-safe').abort = true
 
 switch (process.env.NODE_ENV) {
@@ -25,7 +25,7 @@ function reset(fileName) {
 
 module.exports = function(fileName) {
 	return {
-		describe: require('zora').test,
+		describe: require('muggle-test'),
 		isInstalled: require('is-installed'),
 		td: require('testdouble'),
 		otherName: otherName(fileName)

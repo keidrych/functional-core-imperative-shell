@@ -6,6 +6,7 @@ const rfdc = require('rfdc')({proto: true})
 
 const pipeline = [_init, world, _end]
 
+/* istanbul ignore next: passthrough */
 function _init({request, _cache = {}, _out = {}, ..._passthrough}) {
 	return {
 		request,
@@ -29,10 +30,12 @@ async function world({_out, _cache = {}, ..._passthrough}) {
 	}
 }
 
+/* istanbul ignore next: passthrough */
 function _end({request, _out, _cache}) {
 	return rfdc(_out)
 }
 
+/* istanbul ignore next */
 module.exports = data =>
 	core
 		.pPipe(...pipeline)(data)
