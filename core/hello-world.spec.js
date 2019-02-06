@@ -2,7 +2,7 @@ require('resquire')
 
 const rewire = require('rewire')
 const faker = require('faker')
-const {describe, td, otherName} = require('^tap')(__filename)
+const {describe, td, otherName} = require('^iface/tap')(__filename)
 const jsonPatch = require('fast-json-patch')
 const rfdc = require('rfdc')({proto: true})
 
