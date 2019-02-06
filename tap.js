@@ -1,6 +1,5 @@
 'use strict'
 
-require('tap-spec-integrated')
 require('make-promises-safe').abort = true
 
 switch (process.env.NODE_ENV) {

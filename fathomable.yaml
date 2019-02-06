@@ -1,0 +1,5 @@
+sotekton:
+  fcis:
+    repository:
+      domain: 742773893669.dkr.ecr.ap-southeast-2.amazonaws.com
+    version: 0.0.0
